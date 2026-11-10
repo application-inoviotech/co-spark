@@ -2,6 +2,8 @@ import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { ZiggyVue } from '../../../vendor/tightenco/ziggy';
 import AdminLayout from './Layouts/AdminLayout.vue';
+import 'sweetalert2/dist/sweetalert2.css';
+import './admin.css';
 
 createInertiaApp({
     title: title => (title ? `${title} — COSPARK Admin` : 'COSPARK Admin'),

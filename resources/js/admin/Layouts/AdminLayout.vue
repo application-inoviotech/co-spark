@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
+import AdminIcon from '../Components/AdminIcon.vue';
 
 const page = usePage();
 const open = ref(false);
@@ -40,34 +41,34 @@ const logout = () => router.post(page.props.site.logout);
 <template>
   <div class="dash">
     <aside class="dash-side" :class="{ open }">
-      <button type="button" class="dash-close" aria-label="Close menu" @click="open = false">&times;</button>
+      <button type="button" class="dash-close" aria-label="Close menu" @click="open = false"><AdminIcon name="close" /></button>
       <Link :href="route('admin.dashboard')" class="logo" style="color:#fff">
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 2.5 4.5 7v8.2c0 7 4.9 12.4 11.5 14.3 6.6-1.9 11.5-7.3 11.5-14.3V7L16 2.5Z" stroke="currentColor" stroke-width="1.4"/><path d="m16 10 2 4 4 2-4 2-2 4-2-4-4-2 4-2 2-4Z" fill="#C8753D"/></svg>
         <span class="logo-t"><b>COSPARK</b><span>ADMIN PORTAL</span></span>
       </Link>
       <nav class="dash-nav" aria-label="Admin">
-        <Link :href="route('admin.dashboard')" :class="{ on: route().current('admin.dashboard') }">Dashboard</Link>
-        <Link :href="route('admin.qr.scan')" :class="{ on: route().current('admin.qr.scan') }">QR scan & redeem</Link>
+        <Link :href="route('admin.dashboard')" :class="{ on: route().current('admin.dashboard') }"><AdminIcon name="dashboard" />Dashboard</Link>
+        <Link :href="route('admin.qr.scan')" :class="{ on: route().current('admin.qr.scan') }"><AdminIcon name="scan" />QR scan & redeem</Link>
         <template v-for="(items, group) in page.props.nav" :key="group">
           <h6>{{ group }}</h6>
-          <Link v-for="item in items" :key="item.key" :href="item.href" :class="{ on: isActive(item.href) }">{{ item.label }}</Link>
+          <Link v-for="item in items" :key="item.key" :href="item.href" :class="{ on: isActive(item.href) }"><AdminIcon :name="item.key" />{{ item.label }}</Link>
         </template>
         <h6>System</h6>
-        <Link :href="route('admin.reports')" :class="{ on: route().current('admin.reports') }">Reports</Link>
-        <Link :href="route('admin.settings')" :class="{ on: route().current('admin.settings') }">Settings</Link>
+        <Link :href="route('admin.reports')" :class="{ on: route().current('admin.reports') }"><AdminIcon name="reports" />Reports</Link>
+        <Link :href="route('admin.settings')" :class="{ on: route().current('admin.settings') }"><AdminIcon name="settings" />Settings</Link>
       </nav>
       <div class="dash-user">
         <span class="avatar">{{ page.props.auth.name?.split(' ').map(p => p[0]).join('').slice(0, 2) }}</span>
-        <div><div style="color:#fff">{{ page.props.auth.name }}</div><a :href="page.props.site.home" class="mono" style="font-size:9px;color:var(--copper-2)">View website</a></div>
-        <button type="button" class="out" aria-label="Sign out" title="Sign out" @click="logout"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H4V3h5M16 17l5-5-5-5M21 12H9"/></svg></button>
+        <div><div style="color:#fff">{{ page.props.auth.name }}</div><a :href="page.props.site.home" class="mono">View website</a></div>
+        <button type="button" class="out" aria-label="Sign out" title="Sign out" @click="logout"><AdminIcon name="sign-out" /></button>
       </div>
     </aside>
     <div class="dash-backdrop" :class="{ on: open }" @click="open = false"></div>
     <div class="dash-main">
       <header class="dash-top">
-        <button class="icon-btn mob-dash-toggle" aria-label="Open menu" @click="open = !open">☰</button>
-        <div><span class="mono muted" style="font-size:9.5px">Admin portal</span><h1 id="pageTitle"></h1></div>
-        <div class="right"><button type="button" class="btn btn-line btn-sm top-out" aria-label="Sign out" @click="logout"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H4V3h5M16 17l5-5-5-5M21 12H9"/></svg><span>Sign out</span></button></div>
+        <button type="button" class="icon-btn mob-dash-toggle" aria-label="Open menu" @click="open = !open"><AdminIcon name="menu" /></button>
+        <div><span class="mono">Admin portal</span><h1 id="pageTitle"></h1></div>
+        <div class="right"><button type="button" class="btn btn-line btn-sm top-out" aria-label="Sign out" @click="logout"><AdminIcon name="sign-out" /><span>Sign out</span></button></div>
       </header>
       <div class="dash-body" :class="{ 'is-loading': loading }" :aria-busy="loading"><slot /></div>
       <div v-if="loading" class="admin-loader" role="status" aria-label="Loading"><span></span></div>

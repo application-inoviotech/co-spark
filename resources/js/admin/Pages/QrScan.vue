@@ -2,6 +2,8 @@
 import { onBeforeUnmount, ref } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import Field from '@/Components/Field.vue';
+import AdminIcon from '@/Components/AdminIcon.vue';
+import PanelHeading from '@/Components/PanelHeading.vue';
 
 /* Partner terminal: scan (camera, where the browser supports BarcodeDetector) or type the member QR code. */
 const props = defineProps({ partners: Object });
@@ -32,18 +34,26 @@ const redeem = () => form.post(route('admin.qr.redeem'), { preserveScroll: true,
 <template>
   <Head title="QR scan & redeem" />
   <Teleport defer to="#pageTitle">QR scan & redeem</Teleport>
-  <form class="box" style="max-width:640px" @submit.prevent="redeem">
-    <p class="muted small" style="margin-top:0">The system validates the QR code, the member, their membership and permissions and the available balance, then records the redemption and notifies the member.</p>
-    <div v-if="canScan" style="margin-bottom:16px">
-      <video v-show="scanning" ref="video" playsinline style="width:100%;border-radius:4px;background:#000"></video>
-      <button type="button" class="btn btn-line btn-sm" @click="scanning ? stop() : scan()">{{ scanning ? 'Stop camera' : 'Scan with camera' }}</button>
+  <form class="box admin-panel" @submit.prevent="redeem">
+    <PanelHeading icon="qr-code" title="Member redemption" description="The system validates the QR code, the member, their membership and permissions and the available balance, then records the redemption and notifies the member." />
+    <div class="panel-body">
+      <div v-if="canScan" class="qr-tools">
+        <video v-show="scanning" ref="video" playsinline class="qr-preview"></video>
+        <button type="button" class="btn btn-line btn-sm" @click="scanning ? stop() : scan()">
+          <AdminIcon :name="scanning ? 'stop' : 'scan'" />{{ scanning ? 'Stop camera' : 'Scan with camera' }}
+        </button>
+      </div>
+      <div class="form-grid">
+        <Field v-model="form.code" :field="{ label: 'Member QR code', hint: 'Scanned or typed code' }" :error="form.errors.code" />
+        <Field v-model="form.partner_id" :field="{ label: 'Partner', type: 'select', options: partners, half: true }" :error="form.errors.partner_id" />
+        <Field v-model="form.amount" :field="{ label: 'Credit (DT)', type: 'number', half: true }" :error="form.errors.amount" />
+        <Field v-model="form.location" :field="{ label: 'Location (optional)' }" :error="form.errors.location" />
+      </div>
     </div>
-    <div class="form-grid">
-      <Field v-model="form.code" :field="{ label: 'Member QR code', hint: 'Scanned or typed code' }" :error="form.errors.code" />
-      <Field v-model="form.partner_id" :field="{ label: 'Partner', type: 'select', options: partners, half: true }" :error="form.errors.partner_id" />
-      <Field v-model="form.amount" :field="{ label: 'Credit (DT)', type: 'number', half: true }" :error="form.errors.amount" />
-      <Field v-model="form.location" :field="{ label: 'Location (optional)' }" :error="form.errors.location" />
+    <div class="panel-footer panel-footer-end">
+      <button class="btn btn-copper" :disabled="form.processing">
+        <AdminIcon name="check" />{{ form.processing ? 'Validating…' : 'Validate & redeem' }}
+      </button>
     </div>
-    <div class="form-nav"><span></span><button class="btn btn-copper" :disabled="form.processing">{{ form.processing ? 'Validating…' : 'Validate & redeem' }}</button></div>
   </form>
 </template>

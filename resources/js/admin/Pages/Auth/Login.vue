@@ -1,5 +1,6 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3';
+import AdminIcon from '@/Components/AdminIcon.vue';
 
 defineOptions({ layout: false });
 
@@ -19,13 +20,16 @@ const submit = () => form.post(route('admin.login.store'), { onFinish: () => for
         <h2 style="margin-top:18px">Protect today. Build tomorrow.</h2>
         <p style="color:#97A1AF;max-width:36ch;margin-top:18px">Members, producers, policies, claims, payments and content — managed in one place.</p>
       </div>
-      <span class="mono" style="color:#5E6878">COSPARK Insurance Group · Rochester, MI</span>
+      <span class="mono">COSPARK Insurance Group · Rochester, MI</span>
     </aside>
     <main class="auth-main">
       <div class="auth-form">
-        <a :href="route('home')" class="crumbs" style="margin-bottom:30px;display:inline-flex">← Back to site</a>
-        <h1 style="font-size:46px">Sign in</h1>
-        <p class="muted" style="margin:10px 0 28px">Authorised COSPARK team members only.</p>
+        <a :href="route('home')" class="record-back"><AdminIcon name="back" />Back to site</a>
+        <div class="auth-heading">
+          <AdminIcon name="policy" class="panel-icon" />
+          <h1>Sign in</h1>
+          <p class="muted">Authorised COSPARK team members only.</p>
+        </div>
         <form novalidate @submit.prevent="submit">
           <div class="form-grid">
             <div class="field" :class="{ err: form.errors.email }">
@@ -39,10 +43,12 @@ const submit = () => form.post(route('admin.login.store'), { onFinish: () => for
               <span class="err-msg">{{ form.errors.password }}</span>
             </div>
           </div>
-          <div class="row-between" style="margin:18px 0 26px">
+          <div class="auth-options">
             <label class="checkline"><input v-model="form.remember" type="checkbox"> Keep me signed in</label>
           </div>
-          <button class="btn btn-dark btn-block" type="submit" :disabled="form.processing">{{ form.processing ? 'Signing in…' : 'Sign in →' }}</button>
+          <button class="btn btn-dark btn-block" type="submit" :disabled="form.processing">
+            <AdminIcon name="sign-in" />{{ form.processing ? 'Signing in…' : 'Sign in' }}
+          </button>
         </form>
       </div>
     </main>
