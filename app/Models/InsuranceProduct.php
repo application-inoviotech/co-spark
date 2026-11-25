@@ -9,9 +9,9 @@ use Illuminate\Support\Str;
 
 class InsuranceProduct extends Model
 {
-    protected $fillable = ['insurance_category_id', 'slug', 'name', 'image_url', 'tagline', 'intro', 'quote_type', 'sort_order', 'is_active'];
+    protected $fillable = ['insurance_category_id', 'slug', 'name', 'image_url', 'tagline', 'intro', 'quote_type', 'sort_order', 'is_active', 'content'];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = ['is_active' => 'boolean', 'content' => 'array'];
 
     public function getRouteKeyName(): string
     {
@@ -28,10 +28,10 @@ class InsuranceProduct extends Model
         return $query->where('is_active', true)->orderBy('sort_order');
     }
 
-    /** Product name without the trailing " Insurance", lower-cased for copy ("car", "homeowners"). */
+    /** Sentence-friendly product name, preserving the ATV and RV initialisms. */
     public function getShortNameAttribute(): string
     {
-        return Str::lower(str_replace(' Insurance', '', $this->name));
+        return preg_replace_callback('/\b(atv|rv)\b/i', fn ($match) => strtoupper($match[0]), Str::lower(str_replace(' Insurance', '', $this->name)));
     }
 
     /** Images are stored at 1600px; cards use a smaller rendition. */

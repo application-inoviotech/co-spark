@@ -1,0 +1,110 @@
+COSPARK insurance content review implementation
+Review date: 25 November 2026
+Source: client Flagged Content Review dated 13 November 2026
+
+LIVE ADMIN CHANGES COMPLETED AND VERIFIED
+
+22. Home producer note and Become a Producer requirements introduction now
+    distinguish state-issued insurance licensing from COSPARK application and
+    onboarding work in the producer portal. Saved through the live admin and
+    checked on both public pages.
+
+LOCAL CODE CHANGES AWAITING DEPLOYMENT
+
+1-2. Life, term, whole and universal life FAQs describe age/health underwriting,
+     no deductible, and separately priced life premiums without bundle savings.
+3. Term life has its own benefit cards without a permanent-policy cash value card.
+4. Whole and universal life options no longer inherit term-only choices.
+5. Renters and Auto & Renters describe personal property and liability; neither
+   presents the rented building or detached structures as renters coverage.
+6. Condo cards describe unit responsibilities coordinated with the HOA master
+   policy, rather than promising whole-building or detached-structure coverage.
+7. Landlord cards describe covered lost rent and landlord-owned property;
+   tenants' belongings require their own insurance.
+8. Vacant Home no longer inherits homeowners living-expense coverage.
+9-11. Flood uses building/contents coverage, appropriate limits and deductible
+      options, NFIP contents actual cash value, and no NFIP bundle discount.
+      The member-benefit list no longer promises auto bundle savings. The
+      coverage boundaries explain NFIP exclusions rather than selling them.
+12. Earthquake has earthquake-specific dwelling, contents and living-expense
+    cards and options, without unrelated liability or homeowners endorsements.
+13. Boat uses hull/equipment, boating liability, uninsured boater and on-water
+    towing terminology, with boat-specific options.
+14. Motorcycle, ATV and Other Recreational have their own coverage and options;
+    inherited zero-deductible glass and car rental wording is removed.
+15. Standard Car options no longer offer agreed/stated value. Classic Auto keeps
+    its existing specialist category options.
+16. Commercial Auto, Commercial Property, Workers Compensation and General
+    Liability have separate coverage cards and options.
+17. Workers Compensation FAQs discuss payroll, job class, experience and state
+    rules, typical lack of a deductible, and separately rated premiums.
+18. Medicare, Health, Pet and Device Protection use distinct coverage and options
+    and appropriate pricing and claim-reporting guidance.
+19. Medicare FAQ does not promise bundle discounts.
+20. Medicare and Health FAQs no longer advertise a 5%/7% premium-based token
+    allocation. The replacement copy makes no reward promise and requires
+    specific plan/rule eligibility confirmation before enrollment. Their benefit
+    lists separate membership from plan benefits and costs.
+    CLIENT COMPLIANCE SIGN-OFF REMAINS REQUIRED: this is a content correction,
+    not a legal opinion or approval of a Medicare/ACA rewards program. No token
+    ledger, billing or membership eligibility business rules were changed.
+21. Financial Solutions and Asset Management use service/fee/risk/account FAQs,
+    service headings and a contact CTA instead of insurance quote/claim language.
+22. Local Home/Producer defaults match the live admin corrections.
+23. Claims buttons use the correct article: File an auto claim / an other claim.
+24. Auto & Home and Auto & Renters ask about adding other policies to a bundle.
+25. Product short names preserve ATV and RV capitalization in FAQs and CTAs.
+
+HOW PRODUCT CONTENT NOW WORKS
+
+The new InsuranceContent resolver uses product CMS overrides first, reviewed
+product defaults second, and category copy as the fallback for remaining fields.
+Existing deployed products receive corrections without reseeding catalog data.
+The product admin adds coverage, options, benefits and FAQ editors. Saving one
+product does not change its siblings. Blank fields restore their defaults.
+Coverage and FAQ lines require Title | Description / Question | Answer format.
+Text remains escaped by Blade when rendered on public pages.
+
+DEPLOYMENT
+
+Changes are in the local working tree; commit and push the intended files before
+pulling them on the live server. package-lock.json was already modified before
+this task and was not changed as part of the content correction.
+
+After pulling on live, run with the site's PHP version:
+
+    composer dump-autoload
+    php artisan migrate --force
+    php artisan optimize:clear
+
+The migration adds one nullable JSON content column to insurance_products.
+No catalog seeder is needed; reseeding could overwrite existing CMS changes.
+No JavaScript source changed. The existing local admin Vite build was generated
+to allow the admin HTML regression checks to run.
+
+Then check /insurance/term-life, /insurance/flood, /insurance/medicare,
+/insurance/asset-management, /claims and an Insurance products edit form.
+The public product corrections cannot be verified on live until deployment.
+
+VALIDATION COMPLETED
+
+InsuranceContentReviewTest and existing QaRegressionTest:
+75 tests passed, 705 assertions. This includes rendering all 35 catalog product
+pages and checking the admin edit, save, sibling isolation and reset flows.
+Laravel Pint passed for all seven changed/new PHP implementation and test files.
+git diff --check passed. The existing local admin Vite production build passed.
+
+REFERENCE CHECKS
+
+NAIC life insurance consumer guidance:
+https://content.naic.org/consumer/life-insurance.htm
+Florida Department of Financial Services flood coverage FAQ:
+https://www.myfloridacfo.com/division/consumers/storm/flood-disaster-faqs
+California Department of Insurance earthquake guidance:
+https://www.insurance.ca.gov/01-consumers/105-type/95-guides/03-res/eq-ins.cfm
+Medicare official costs overview:
+https://www.medicare.gov/basics/costs/medicare-costs
+
+These general references do not establish COSPARK-specific carrier availability,
+endorsements, service registrations or reward eligibility. Copy qualifies those
+features; the client must confirm actual offerings and compliance approval.

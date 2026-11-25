@@ -28,7 +28,7 @@ return [
 
         'req_eyebrow' => ['Requirements · eyebrow', 'text', 'Requirements'],
         'req_title' => ['Requirements · title', 'textarea', 'Before you apply.'],
-        'req_lead' => ['Requirements · intro', 'textarea', "Read these terms carefully — they're part of the producer agreement."],
+        'req_lead' => ['Requirements · intro', 'textarea', "Insurance licenses are issued by state regulators. The producer portal supports COSPARK applications and onboarding. Read these terms carefully — they're part of the producer agreement."],
         'requirements' => ['Requirements · list', 'lines', [
             "An active insurance license (or in progress) for the lines you'll write",
             'A maintained COSPARK Associate membership at {associate.fee}/month',

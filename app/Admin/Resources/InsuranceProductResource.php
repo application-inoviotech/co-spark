@@ -5,6 +5,7 @@ namespace App\Admin\Resources;
 use App\Admin\Resource;
 use App\Models\InsuranceCategory;
 use App\Models\InsuranceProduct;
+use App\Support\InsuranceContent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
@@ -59,6 +60,10 @@ class InsuranceProductResource extends Resource
             ['name' => 'tagline', 'label' => 'Hero headline'],
             ['name' => 'intro', 'label' => 'Introduction', 'type' => 'textarea'],
             ['name' => 'image_url', 'label' => 'Hero image URL'],
+            ['name' => 'coverage_lines', 'label' => 'Product coverage or services', 'type' => 'lines', 'hint' => 'One per line: Title | Description. Blank restores the product default.'],
+            ['name' => 'options', 'label' => 'Product options', 'type' => 'lines', 'hint' => 'One option per line. Blank restores the product default.'],
+            ['name' => 'benefits', 'label' => 'Product member benefits', 'type' => 'lines', 'hint' => 'One benefit per line. Confirm eligibility before promising discounts or rewards.'],
+            ['name' => 'faq_lines', 'label' => 'Product FAQs', 'type' => 'lines', 'hint' => 'One per line: Question | Answer. Confirm Medicare and health reward wording with compliance before publishing.'],
             ['name' => 'sort_order', 'label' => 'Sort order', 'type' => 'number', 'half' => true],
             ['name' => 'is_active', 'label' => 'Published', 'type' => 'checkbox'],
         ];
@@ -71,6 +76,53 @@ class InsuranceProductResource extends Resource
             'insurance_category_id' => ['required', Rule::exists('insurance_categories', 'id')], 'quote_type' => ['required', Rule::in(array_keys(config('cospark.quote_types')))],
             'tagline' => ['required', 'string', 'max:160'], 'intro' => ['required', 'string', 'max:1000'], 'image_url' => ['required', 'url', 'max:500'],
             'sort_order' => ['nullable', 'integer'], 'is_active' => ['boolean'],
+            'coverage_lines' => ['nullable', 'string', 'max:15000', 'regex:/\A(?:\h*\S[^\r\n|]*\|\h*\S[^\r\n]*(?:\R|\z)|\h*\R)*\h*\z/u'],
+            'faq_lines' => ['nullable', 'string', 'max:15000', 'regex:/\A(?:\h*\S[^\r\n|]*\|\h*\S[^\r\n]*(?:\R|\z)|\h*\R)*\h*\z/u'],
+            'options' => ['nullable', 'string', 'max:10000'],
+            'benefits' => ['nullable', 'string', 'max:10000'],
         ];
+    }
+
+    public function value(Model $model, string $field): mixed
+    {
+        if (! in_array($field, ['coverage_lines', 'options', 'benefits', 'faq_lines'], true)) {
+            return parent::value($model, $field);
+        }
+        $copy = app(InsuranceContent::class)->forProduct($model);
+
+        return match ($field) {
+            'coverage_lines' => array_map(fn ($row) => $row['title'].' | '.$row['text'], $copy['coverage']),
+            'faq_lines' => array_map(fn ($row) => $row[0].' | '.$row[1], $copy['faqs']),
+            default => $copy[$field],
+        };
+    }
+
+    public function save(Model $model, array $data): Model
+    {
+        $content = $model->content ?? [];
+        foreach (['coverage_lines' => 'coverage', 'options' => 'options', 'benefits' => 'benefits', 'faq_lines' => 'faqs'] as $field => $key) {
+            if (! array_key_exists($field, $data)) {
+                continue;
+            }
+            if ($data[$field] === []) {
+                unset($content[$key]);
+            } else {
+                $content[$key] = match ($field) {
+                    'coverage_lines' => array_map(function ($line) {
+                        [$title, $text] = array_map('trim', explode('|', $line, 2));
+
+                        return ['title' => $title, 'text' => $text];
+                    }, $data[$field]),
+                    'faq_lines' => array_map(fn ($line) => array_map('trim', explode('|', $line, 2)), $data[$field]),
+                    default => $data[$field],
+                };
+            }
+            unset($data[$field]);
+        }
+        $model->fill($data);
+        $model->content = $content ?: null;
+        $model->save();
+
+        return $model;
     }
 }

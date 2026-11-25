@@ -94,7 +94,7 @@ return [
         'producer_stats' => ['11 Producers · stats', 'lines', ['75% | Commission', '2,000 | Token bonus', '10% | Vacation discount'], 'One stat per line: Value | Label'],
         'producer_cta_primary' => ['11 Producers · main button', 'text', 'Become a Producer'],
         'producer_cta_secondary' => ['11 Producers · second button', 'text', 'View Producer Benefits'],
-        'producer_note' => ['11 Producers · note', 'text', 'Licensing and application workflow handled inside the producer portal'],
+        'producer_note' => ['11 Producers · note', 'text', 'Insurance licenses are issued by state regulators. Manage your COSPARK application and onboarding through the producer portal.'],
 
         'final_eyebrow' => ['Final CTA · eyebrow', 'text', 'Start your COSPARK journey'],
         'final_title' => ['Final CTA · title', 'textarea', "Protect Today.\nBuild Tomorrow."],
